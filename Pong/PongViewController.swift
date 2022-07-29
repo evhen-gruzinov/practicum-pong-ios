@@ -207,18 +207,12 @@ class PongViewController: UIViewController {
 
     private func updateUserScoreLabel() {
         userScoreLabel.text = "\(userScore)"
-        
-        if userScore == 5 {
-            userVictory(whoWin: "Player")
-        }
+        if userScore == 5 {userVictory(whoWin: "Player")}
     }
     
     private func updateEnemyScoreLabel() {
         enemyScoreLabel.text = "\(enemyScore)"
-        
-        if enemyScore == 5 {
-            userVictory(whoWin: "Enemy")
-        }
+        if enemyScore == 5 {userVictory(whoWin: "Enemy")}
     }
     
     private func userVictory(whoWin: String) {
@@ -237,18 +231,25 @@ class PongViewController: UIViewController {
         self.shouldLaunchBallOnNextTap = false
         ballView.isHidden = true
         lineView.isHidden = true
+        userPaddleView.isHidden = true
+        enemyPaddleView.isHidden = true
 
         resultLabel.isHidden = false
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             // этот код запустится через 3 секунды
+            //
+            // Возврат платформы игрока на стартовую позицию
+            self.userPaddleView.frame.origin.x = (self.view.bounds.width - self.enemyPaddleView.frame.width) / 2
+            self.dynamicAnimator?.updateItem(usingCurrentState: self.userPaddleView)
+            
             self.resultLabel.isHidden = true
             self.shouldLaunchBallOnNextTap = true
             self.ballView.isHidden = false
             self.userScore =  0
             self.enemyScore = 0
-            
-            //TODO: Добавить возврат платформы игрока на стартовую позицию
+            self.userPaddleView.isHidden = false
+            self.enemyPaddleView.isHidden = false
             
         }
     }
