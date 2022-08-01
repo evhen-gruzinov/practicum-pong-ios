@@ -235,5 +235,9 @@ extension PongViewController {
             ),
             size: ballSize
         )
+        
+        // Возврат платформы игрока на стартовую позицию
+        self.userPaddleView.frame.origin.x = (self.view.bounds.width - self.enemyPaddleView.frame.width) / 2
+        self.dynamicAnimator?.updateItem(usingCurrentState: self.userPaddleView)
     }
 }

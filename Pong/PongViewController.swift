@@ -239,9 +239,7 @@ class PongViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             // этот код запустится через 3 секунды
             //
-            // Возврат платформы игрока на стартовую позицию
-            self.userPaddleView.frame.origin.x = (self.view.bounds.width - self.enemyPaddleView.frame.width) / 2
-            self.dynamicAnimator?.updateItem(usingCurrentState: self.userPaddleView)
+           
             
             self.resultLabel.isHidden = true
             self.shouldLaunchBallOnNextTap = true
