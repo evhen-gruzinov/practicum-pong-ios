@@ -45,7 +45,7 @@ extension PongViewController {
         )
     }
 
-    /// Эта функция проигрывает звук столкновения
+    /// This function plays the sound of the collision
     func playHitSound(_ hitSound: HitSound) {
         guard let hitSoundURL = hitSound.fileURL else {
             print("Failed to get sound url for sound \(hitSound.fileName)")
@@ -72,10 +72,10 @@ extension PongViewController {
     }
 }
 
-// NOTE: Это расширение позволяет отслеживать события проигрывателей звука
+// NOTE: This extension allows you to track the events of audio players
 extension PongViewController: AVAudioPlayerDelegate {
 
-    /// Эта функция вызывается, когда проигрыватель завершил воспроизведение звука
+    /// This function is called when the player has finished playing sound
     func audioPlayerDidFinishPlaying(
         _ player: AVAudioPlayer,
         successfully flag: Bool

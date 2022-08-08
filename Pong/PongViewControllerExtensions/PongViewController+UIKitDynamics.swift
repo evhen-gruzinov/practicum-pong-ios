@@ -11,9 +11,9 @@ extension PongViewController {
     
     // MARK: - UIKitDynamics
 
-    /// Эта функция настраивает динамику взаимодействия элементов
+    /// This function adjusts the dynamics of element interaction
     func enableDynamics() {
-        // NOTE: Даем мячу, платформе игрока и платформе соперника специальный тэг для идентификации
+        // NOTE: Give the ball, the player's platform and the opponent's platform a special tag for identification
         ballView.tag = Constants.ballTag
         userPaddleView.tag = Constants.userPaddleTag
         enemyPaddleView.tag = Constants.enemyPaddleTag
@@ -57,29 +57,29 @@ extension PongViewController {
     }
 }
 
-// NOTE: Это расширение определяет функции обработки столкновений в динамике элементов
+// NOTE: This extension defines collision handling functions in element dynamics
 extension PongViewController: UICollisionBehaviorDelegate {
 
     // MARK: - UICollisionBehaviorDelegate
 
-    /// Эта функция обрабатывает столкновения объектов
+    /// This function handles object collisions
     func collisionBehavior(
         _ behavior: UICollisionBehavior,
         beganContactFor item1: UIDynamicItem,
         with item2: UIDynamicItem,
         at p: CGPoint
     ) {
-        /// Пытаемся опеределить являются ли столкнувшиеся объекты элементами отображения
+        /// We try to determine if the colliding objects are elements of the mapping
         guard
             let view1 = item1 as? UIView,
             let view2 = item2 as? UIView
         else { return }
 
-        /// Получаем имена столкнувшихся элементов по тэгу
+        /// Get the names of the colliding elements by the tag
         let view1Name: String = getNameFromViewTag(view1)
         let view2Name: String = getNameFromViewTag(view2)
 
-        /// Печатаем названия столкнувшихся элементов
+        /// Print the names of the colliding elements
         print("\(view1Name) has hit \(view2Name)")
 
         if let ballDynamicBehavior = self.ballDynamicBehavior {
@@ -96,14 +96,14 @@ extension PongViewController: UICollisionBehaviorDelegate {
         }
     }
 
-    /// Эта функция обрабатывает столкновение объекта и рамки
+    /// This function handles object and frame collision
     func collisionBehavior(
         _ behavior: UICollisionBehavior,
         beganContactFor item: UIDynamicItem,
         withBoundaryIdentifier identifier: NSCopying?,
         at p: CGPoint
     ) {
-        // NOTE: Пытаемся опеределить по тэгу, является ли объект столкновения мячом
+        // NOTE: Trying to determine from the tag if the object of the collision is a ball
         guard
             identifier == nil,
             let itemView = item as? UIView,
@@ -114,16 +114,16 @@ extension PongViewController: UICollisionBehaviorDelegate {
 
         var shouldResetBall: Bool = false
         if abs(p.y) <= Constants.contactThreshold {
-            // NOTE: Если место столкновения близко к верхней границе,
-            // значит мяч ударился о верхнюю грань экрана
+            // NOTE: If the collision site is close to the upper boundary,
+            // it means the ball hit the top edge of the screen
             //
-            // Увеличиваем счет игрока
+            // Increase the player's score
             userScore += 1
             shouldResetBall = true
             print("Ball has hit enemy side. User score is now: \(userScore)")
         } else if abs(p.y - view.bounds.height) <= Constants.contactThreshold {
-            // NOTE: Если место столкновения близко к нижней границе,
-            // значит мяч ударился о нижнюю грань экрана
+            // NOTE: If the place of collision is close to the bottom edge,
+            // it means that the ball hit the bottom edge of the screen
             
             enemyScore += 1
             shouldResetBall = true
@@ -143,7 +143,7 @@ extension PongViewController: UICollisionBehaviorDelegate {
 
     // MARK: - Utils
 
-    /// Эта вспомогательная функция возвращает название элемента, определяя его по "тэгу"
+    /// This helper function returns the name of the element by defining it by the "tag"
     private func getNameFromViewTag(_ view: UIView) -> String {
         switch view.tag {
         case Constants.ballTag:
@@ -161,23 +161,23 @@ extension PongViewController: UICollisionBehaviorDelegate {
     }
 }
 
-// NOTE: Это расширение определяет функции для сброса мяча
+// NOTE: This extension defines functions for dropping the ball
 extension PongViewController {
 
     // MARK: - Reset Ball
 
-    /// Эта функция останавливает движение мяча и сбрасывает мяч его положение на середину экрана
+    /// This function stops the movement of the ball and resets its position to the middle of the screen
     private func resetBallWithAnimation() {
-        // NOTE: отсанавливаем движение мяча
+        // NOTE: Stopping the ball from moving
         stopBallMovement()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            // NOTE: через 1 секунду сбрасываем положение мяча и анимируем его появление
+            // NOTE: after 1 second reset the position of the ball and animate its appearance
             self?.resetBallViewPositionAndAnimateBallAppear()
         }
     }
 
-    /// Эта функция останавливает движение мяча
+    /// This function stops the movement of the ball
     private func stopBallMovement() {
         if let ballPushBehavior = self.ballPushBehavior {
             self.ballPushBehavior = nil
@@ -195,13 +195,13 @@ extension PongViewController {
         dynamicAnimator?.updateItem(usingCurrentState: self.ballView)
     }
 
-    /// Эта функция сбрасывает положение мяча и анимирует его появление
+    /// This function resets the position of the ball and animates its appearance
     private func resetBallViewPositionAndAnimateBallAppear() {
-        // NOTE: сбрасываем положение шарика
+        // NOTE: reset the ball position
         resetBallViewPosition()
         dynamicAnimator?.updateItem(usingCurrentState: self.ballView)
 
-        // NOTE: устанавливаем прозрачность и размер мяча
+        // NOTE: set the transparency and size of the ball
         ballView.alpha = 0.0
         ballView.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
 
@@ -210,23 +210,23 @@ extension PongViewController {
             delay: 0,
             options: .curveEaseOut,
             animations: {
-                // устанавливаем прозрачность и размер мяча возвращая их к нормальному состоянию
+                // set the transparency and size of the ball back to normal
                 self.ballView.alpha = 1.0
                 self.ballView.transform = .identity
             },
             completion: { [weak self] _ in
-                /// по окончанию анимации включаем обработку следующего нажатия для запуска мяча
+                /// at the end of the animation we turn on the processing of the next press to start the ball
                 self?.hasLaunchedBall = false
             }
         )
     }
 
-    /// Эта функция сбрасывает положение мяча на центр экрана
+    /// This function resets the position of the ball to the center of the screen
     private func resetBallViewPosition() {
-        // NOTE: сбрасываем любые трансформации мяча
+        // NOTE: reset any transformations of the ball
         ballView.transform = .identity
 
-        // NOTE: Сбрасываем положение мяча
+        // NOTE: Resetting the ball position
         let ballSize: CGSize = ballView.frame.size
         ballView.frame = CGRect(
             origin: CGPoint(
@@ -236,7 +236,7 @@ extension PongViewController {
             size: ballSize
         )
         
-        // Возврат платформы игрока на стартовую позицию
+        // Return the player's platform to the starting position
         self.userPaddleView.frame.origin.x = (self.view.bounds.width - self.enemyPaddleView.frame.width) / 2
         self.dynamicAnimator?.updateItem(usingCurrentState: self.userPaddleView)
     }

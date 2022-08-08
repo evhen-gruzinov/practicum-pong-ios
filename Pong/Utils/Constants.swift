@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-/// Это перечисление констант, используемых в данном файле
+/// This is an enumeration of the constants used in this file
 enum Constants {
 
     static let userPaddleTag: Int = 1

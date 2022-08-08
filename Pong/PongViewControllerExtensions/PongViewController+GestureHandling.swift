@@ -7,39 +7,39 @@
 
 import UIKit
 
-// NOTE: В этом расширении мы настраиваем логику обработки жестов
+// NOTE: In this extension we configure the logic of gesture processing
 extension PongViewController {
 
     // MARK: - Pan Gesture Handling
 
-    /// Эта функция настраивает обработку жеста движения пальцем по экрану
+    /// This feature configures the processing of finger gestures on the screen
     func enabledPanGestureHandling() {
-        // NOTE: Создаем объект обработчика жеста
+        // NOTE: Create a gesture handler object
         let panGestureRecognizer = UIPanGestureRecognizer()
 
-        // NOTE: Добавляем обработчик жеста к представлению экрана
+        // NOTE: Add a gesture handler to the screen view
         view.addGestureRecognizer(panGestureRecognizer)
 
-        // NOTE: Указываем обработчику какую функцию вызывать при обработке жеста
+        // NOTE: Specify to the handler what function to call when processing the gesture
         panGestureRecognizer.addTarget(self, action: #selector(self.handlePanGesture(_:)))
 
-        // NOTE: Сохраняем объект обработчика жеста в переменную класса
+        // NOTE: Save the gesture handler object to a class variable
         self.panGestureRecognizer = panGestureRecognizer
     }
 
-    /// Эта функция обработки жеста.
-    /// Она вызывается каждый раз, когда пользователь двигает пальцем по экрану или касается его
+    /// This is a gesture processing function.
+    /// It is called every time the user moves his finger on the screen or touches it
     @objc private func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
         // NOTE: Смотрим на состояние обработчика жеста
         switch recognizer.state {
         case .began:
-            // NOTE: Жест начал распознаваться, запоминаем текущую позицию платформы
-            // Это состояние, когда пользователь только коснулся экрана
+            // NOTE: The gesture has started to be recognized, remember the current platform position
+            // This is the state when the user has just touched the screen
             lastUserPaddleOriginLocation = userPaddleView.frame.origin.x
 
         case .changed:
-            // NOTE: Произошло изменение касания,
-            // вычисляем смещение пальца и обновляем положение плафтормы
+            // NOTE: A touch shift has occurred,
+            // calculate the finger displacement and update the position of the plafthorpe
             let translation: CGPoint = recognizer.translation(in: view)
             let translatedOriginX: CGFloat = lastUserPaddleOriginLocation + translation.x
 
@@ -50,7 +50,7 @@ extension PongViewController {
             dynamicAnimator?.updateItem(usingCurrentState: userPaddleView)
 
         default:
-            // NOTE: При любом другом состоянии ничего не делаем
+            // NOTE: In any other state we do nothing
             break
         }
     }

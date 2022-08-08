@@ -1,4 +1,5 @@
 # TODO
 
 - [ ] Main menu
-- [ ] Difficult selection
+- [ ] Difficulty selection
+- [x] Translate comments into English

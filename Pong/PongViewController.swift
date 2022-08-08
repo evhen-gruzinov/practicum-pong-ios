@@ -1,77 +1,77 @@
-/// Импортируем библиотеку UI-компонентов (элементы интерфейса)
+/// Import the library of UI components (interface elements)
 import UIKit
 import AVFoundation
 
-/// Это класс единственного экрана нашего приложения
+/// This is the single screen class of our application
 ///
-/// В классе есть элементы отображения игры:
-/// - `ballView` - мяч
-/// - `userPaddleView` - платформа игрока
-/// - `enemyPaddleView` - платформа сопернка
+/// The class has elements of the game display:
+/// - `ballView` - ball
+/// - `userPaddleView` - player platform
+/// - `enemyPaddleView` - opponent's platform
 ///
-/// Также в классе данного экрана настраивается физика взаимодействия элементов
-/// в функции `enableDynamics()`
+/// Also in the class of this screen, the interaction physics of the elements is configured
+/// in the function `enableDynamics()`
 ///
-/// А еще в этом классе реализована обработка движения пальца по экрану,
-/// с помощью обработки этого жеста игрок может двигать свою платформу и отталкивать мяч
+/// And also in this class the processing of finger movements on the screen is implemented,
+/// by processing this gesture, the player can move his platform and push the ball away
 ///
 class PongViewController: UIViewController {
 
     // MARK: - Overriden Properties
 
-    /// Эта переопределенная переменная определяет допустимые ориентации экрана
+    /// This overridden variable defines the allowed screen orientations
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
 
     // MARK: - Subviews
 
-    /// Это переменная отображения мяча
+    /// This is the ball mapping variable
     @IBOutlet var ballView: UIView!
 
-    /// Это переменная отображения платформы игрока
+    /// This is the display variable of the player's platform
     @IBOutlet var userPaddleView: UIView!
 
-    /// Это переменная отображения платформы соперника
+    /// This is the display variable for the opponent's platform
     @IBOutlet var enemyPaddleView: UIView!
 
-    /// Это переменная отображения разделяющей линии
+    /// This is the dividing line mapping variable
     @IBOutlet var lineView: UIView!
 
-    /// Это переменная отображения лэйбла со счетом игрока
+    /// This is a variable displaying the label with the player's score
     @IBOutlet var userScoreLabel: UILabel!
     
-    /// Это переменная отображения лэйбла со счетом противника
+    /// This is the variable for displaying the label with the opponent's score
     @IBOutlet var enemyScoreLabel: UILabel!
     
-    /// Это переменная отображения лэйбла с результатом игры
+    /// This is the variable for displaying the game result label
     @IBOutlet var resultLabel: UILabel!
 
     // MARK: - Instance Properties
 
-    /// Это переменная обработчика жеста движения пальцем по экрану
+    /// This is a gesture handler variable
     var panGestureRecognizer: UIPanGestureRecognizer?
 
-    /// Это переменная в которой мы будем запоминать последнее положение платформы пользователя,
-    /// перед тем как пользователь начал двигать пальцем по экрану
+    /// This is the variable in which we will remember the last position of the user's platform,
+    /// before the user started to move his finger on the screen
     var lastUserPaddleOriginLocation: CGFloat = 0
 
-    /// Это переменная таймера, который будет обновлять положение платформы соперника
+    /// This is the timer variable that will update the position of the opponent's platform
     var enemyPaddleUpdateTimer: Timer?
 
-    /// Это флаг `Bool`, имеет два возможных значения:
-    /// - `true` - можно трактовать как "да"
-    /// - `false` - можно трактовать как "нет"
+    /// This is the `Bool` flag and has two possible values:
+    /// - `true` - can be interpreted as "yes"
+    /// - `false` - can be interpreted as no
     ///
-    /// Он отвечает за необходимость запустить мяч по следующему нажатию на экран
+    /// It is responsible for the need to run the ball on the next screen press
     ///
     var shouldLaunchBallOnNextTap: Bool = false
 
-    /// Это флаг `Bool`, который указывает "был ли запущен мяч"
+    /// This is the `Bool` flag, which indicates "has the ball been launched"
     var hasLaunchedBall: Bool = false
 
     var enemyPaddleUpdatesCounter: UInt8 = 0
 
-    // NOTE: Все переменные ниже вплоть до 74-ой строки необходимы для настроек физики
-    // Мы не будем вдаваться в подробности того, что это такое и как устроено
+    // NOTE: All variables below up to line 74 are needed for the physics setup
+    // We won't go into the details of what these are and how they work
     var dynamicAnimator: UIDynamicAnimator?
     var ballPushBehavior: UIPushBehavior?
     var ballDynamicBehavior: UIDynamicItemBehavior?
@@ -79,15 +79,15 @@ class PongViewController: UIViewController {
     var enemyPaddleDynamicBehavior: UIDynamicItemBehavior?
     var collisionBehavior: UICollisionBehavior?
 
-    // NOTE: Все переменный вплоть до 82-ой строки используются для реагирования
-    // на стлокновения мяча - проигрывание звука столкновения и вибро-отклик
+    // NOTE: All variables up to line 82 are used to react to
+    // on ball collision - play sound of collision and vibration response
     var audioPlayers: [AVAudioPlayer] = []
     var audioPlayersLock = NSRecursiveLock()
     var softImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .soft)
     var lightImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     var rigidImpactFeedbackGenerator = UIImpactFeedbackGenerator(style: .rigid)
 
-    /// Эта переменная плеера предназначена для повторяющегося проигрывания фоновой музыки в игре
+    /// This player variable is for repeated playback of background music in the game
     var backgroundSoundAudioPlayer: AVAudioPlayer? = {
         guard
             let backgroundSoundURL = Bundle.main.url(forResource: "background", withExtension: "wav"),
@@ -100,72 +100,71 @@ class PongViewController: UIViewController {
         return audioPlayer
     }()
 
-    /// Эта переменная хранит счет пользователя
+    /// This variable stores the user account
     var userScore: Int = 0 {
         didSet {
-            /// При каждом обновлении значения переменной - обновляем текст в лэйбле
+            /// Each time the variable value is updated, we update the text in the label
             updateUserScoreLabel()
         }
     }
     
-    /// Эта переменная хранит счет противника
+    /// This variable stores the opponent's score
     var enemyScore: Int = 0 {
         didSet {
-            /// При каждом обновлении значения переменной - обновляем текст в лэйбле
+            /// Each time the variable value is updated, we update the text in the label
             updateEnemyScoreLabel()
         }
     }
 
     // MARK: - Instance Methods
 
-    /// Эта функция запускается 1 раз когда представление экрана загрузилось
-    /// и вот-вот покажется в окне отображения
+    /// This function is started once the screen view is loaded
+    /// and is about to appear in the display window
     override func viewDidLoad() {
         super.viewDidLoad()
 
         /*
-        NOTE: 👨‍💻 Заметка по настройке экрана игры 👨‍💻
+         NOTE:  👨‍💻 Note on setting up the game screen  👨‍💻
 
-        Сейчас этот код выделен серым, потому что слэш со звездочкой
-        над этим текстом и под этим текстом `/* */` делают его многострочным комменатрием.
-        Также комментарии бывают однострочные, они начинаются с двух слэшей: `//`
-        Комментарии в коде - это заметки разработчиков о работе кусочка кода.
-        Комментарии не учитываются при работе программы, а просто игнорируются.
+         This code is now grayed out because the slash with an asterisk
+         above this text and under this text `/* */` make it a multi-line comment.
+         There are also single-line comments, they start with two slashes: `//`.
+         Comments in code are the developers' notes on how a piece of code works.
+         Comments are not taken into account when the program works, and are simply ignored.
 
-        Код на 127-ой строке настраивает все необходимое для игры.
-        Сейчас он закомментирован - в начале строки стоят два слэша `//`,
-        и функция `configurePongGame()` не запустится.
-        Удали два слэша в начале 127-ой строки и запусти проект, чтобы игра заработала!
-        */
+         The code on line 127 sets up everything you need for the game.
+         It is now commented out - there are two slashes `//' at the beginning of the line,
+         And function `configurePongGame()` will not start.
+         */
 
         configurePongGame()
                 
     }
     
-    /// Эта функция вызывается, когда экран PongViewController повяился на экране телефона
+    /// This function is called when the PongViewController screen is displayed on the phone screen
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        // NOTE: Включаем динамику взаимодействия
+        // NOTE: Enabling interaction dynamics
         self.enableDynamics()
     }
 
-    /// Эта функция вызывается, когда экран первый раз отрисовал весь свой интерфейс
+    /// This function is called when the screen has drawn its entire interface for the first time
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        // NOTE: Устанавливаем шару радиус скругления равный половине высоты
+        // NOTE: Set the rounding radius of the ball equal to half the height
         ballView.layer.cornerRadius = ballView.bounds.size.height / 2
     }
 
-    /// Эта функция обрабатывает начало всех касаний экрана
+    /// This function handles the beginning of all screen touches
     override func touchesBegan(
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
         super.touchesBegan(touches, with: event)
 
-        // NOTE: Если нужно запустить мяч и мяч еще не был запущен - запускаем мяч
+        // NOTE: If you want to launch the ball and the ball has not been launched yet, launch the ball
         if shouldLaunchBallOnNextTap, !hasLaunchedBall {
             hasLaunchedBall = true
 
@@ -175,30 +174,30 @@ class PongViewController: UIViewController {
 
     // MARK: - Private Methods
 
-    /// Эта функция выполняет выполняет всю конфигурацию (настройку) экрана
+    /// This function performs the entire configuration (setup) of the screen
     ///
-    /// - включает обработку жеста движения пальцем по экрану
-    /// - включает динамику взаимодействия элементов
-    /// - указывает что при следующем нажатии мяч должен запуститься
+    /// - switches on the processing of the finger gesture on the screen
+    /// - switches on the dynamics of elements interaction
+    /// - indicates that the next press should start the ball
     ///
     private func configurePongGame() {
         
         resultLabel.isHidden = true
         
-        // NOTE: Настраиваем лэйбл со счетом игрока и противника
+        // NOTE: Setting up the label with the score of the player and the opponent
         updateUserScoreLabel()
         updateEnemyScoreLabel()
 
-        // NOTE: Включаем обработку жеста движения пальцем по экрану
+        // NOTE: Turning on finger gesture processing on the screen
         self.enabledPanGestureHandling()
 
-        // NOTE: Включаем логику платформы противника "следовать за мячом"
+        // NOTE: Enabling the logic of the opponent's "follow the ball" platform
         self.enableEnemyPaddleFollowBehavior()
 
-        // NOTE: Указываем, что при следующем нажатии на экран нужно запустить мяч
+        // NOTE: Specify that the next time you press the screen to run the ball
         self.shouldLaunchBallOnNextTap = true
 
-        // NOTE: Начинаем проигрывать фоновую музыку
+        // NOTE: Start playing background music
         self.backgroundSoundAudioPlayer?.prepareToPlay()
         self.backgroundSoundAudioPlayer?.play()
         

@@ -8,10 +8,10 @@
 import Foundation
 import UIKit
 
-// NOTE: Это расширение определяет функцию используемую для запуска мяча
+// NOTE: This extension defines the function used to start the ball
 extension PongViewController {
 
-    /// Функция запуска мяча. Генерирует рандомный вектор скорости мяча и запускает мяч по этому вектору
+    /// Ball launch function. Generates a random vector of ball speed and launches the ball along this vector
     func launchBall() {
         let ballPusher = UIPushBehavior(items: [ballView], mode: .instantaneous)
         self.ballPushBehavior = ballPusher
@@ -22,37 +22,37 @@ extension PongViewController {
         self.dynamicAnimator?.addBehavior(ballPusher)
     }
 
-    /// Функция генерации вектора скорости запуска мяча с почти рандомным направлением
+    /// Function of ball launch velocity vector generation with almost random direction
     private func makeRandomVelocityVector() -> CGVector {
-        // NOTE: Генерируем рандомное число от 0 до 1
+        // NOTE: Generate a random number from 0 to 1
         let randomSeed = Double(arc4random_uniform(1000)) / 1000
 
-        // NOTE: Создаем рандомный угол примерно между Pi/6 (30 градусов) и Pi/3 (60 градусов)
+        // NOTE: Create a random angle between about Pi/6 (30 degrees) and Pi/3 (60 degrees)
         let angle = Double.pi * (0.16 + 0.16 * randomSeed)
 
-        // NOTE: Берем в качестве амплитуды (силы) запуска мяча 1.5 пикселя экрана
+        // NOTE: We take 1.5 pixels of the screen as the amplitude (strength) of the ball launch
         let amplitude = 1.5 / UIScreen.main.scale
 
-        // NOTE: разложение вектора скорости на оси X и Y
+        // NOTE: decomposition of the velocity vector on the X and Y axes
         let x = amplitude * cos(angle)
         let y = amplitude * sin(angle)
 
-        // NOTE: используя сгенерированный угол, возвращаем его в одном из 4 вариаций
+        // NOTE: using the generated angle, return it in one of 4 variations
         switch arc4random() % 4 {
         case 0:
-            // направо, вниз
+            // right, down
             return CGVector(dx: x, dy: y)
 
         case 1:
-            // направо, вверх
+            // right, up
             return CGVector(dx: x, dy: -y)
 
         case 2:
-            // налево, вниз
+            // left, down
             return CGVector(dx: -x, dy: y)
 
         default:
-            // налево, вверх
+            // left, up
             return CGVector(dx: -x, dy: -y)
         }
     }

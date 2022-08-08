@@ -1,14 +1,14 @@
 import UIKit
 import AVFoundation
 
-/// Это главный класс обработки состояний приложения
+/// This is the main state processing class of the application
 ///
-/// В нем происходит настройка приложения на запуске и трэкинг перехода между разными состояниями
+/// It configures the application at startup and tracks the transition between different states
 ///
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    /// Этот метод вызывается 1 раз как только приложение запустилось
+    /// This method is called once as soon as the application is started
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // MARK: - UISceneSession Lifecycle
 
-    /// Этот метод определяет настройки главной "сцены" отображения приложения
+    /// This method defines the settings of the main "scene" of the application display
     func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
